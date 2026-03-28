@@ -1,10 +1,36 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
+import { StoreModule } from './store/store.module';
+import { BranchModule } from './branch/branch.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    // Configuración de variables de entorno
+    ConfigModule.forRoot({
+      // Hace que ConfigModule esté disponible en toda la aplicación
+      isGlobal: true,
+      // Archivo desde el que se leen las variables de entorno
+      envFilePath: '.env',
+    }),
+
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT ?? '3306', 10),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      autoLoadEntities: true,
+      synchronize: true,
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+    }),
+
+    StoreModule,
+
+    BranchModule,
+  ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
