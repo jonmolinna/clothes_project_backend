@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { StoreModule } from './store/store.module';
 import { BranchModule } from './branch/branch.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { BranchModule } from './branch/branch.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      autoLoadEntities: true,
+      // autoLoadEntities: true,
       synchronize: true,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
     }),
@@ -29,6 +30,8 @@ import { BranchModule } from './branch/branch.module';
     StoreModule,
 
     BranchModule,
+
+    UsersModule,
   ],
   controllers: [],
   providers: [],

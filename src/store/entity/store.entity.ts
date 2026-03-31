@@ -12,8 +12,8 @@ import {
 @Entity('stores')
 export class Store {
   // ID del negocio
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   // NOMBRE DEL NEGOCIO
   @Column({ type: 'varchar', length: 255 })
