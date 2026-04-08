@@ -10,6 +10,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Inventory } from 'src/inventory/entity/inventory.entity';
 import { BranchPhone } from './branch-phone.entity';
 import { Store } from 'src/store/entity/store.entity';
 
@@ -52,4 +53,7 @@ export class Branch {
   @ManyToOne(() => Store, (store) => store.branches)
   @JoinColumn({ name: 'store_id' })
   store: Store;
+
+  @OneToMany(() => Inventory, (row) => row.branch)
+  inventoryRows: Inventory[];
 }

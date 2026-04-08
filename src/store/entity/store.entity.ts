@@ -1,4 +1,6 @@
 import { Branch } from 'src/branch/entity/branch.entity';
+import { Category } from 'src/categories/entity/category.entity';
+import { Product } from 'src/products/entity/product.entity';
 import {
   Column,
   CreateDateColumn,
@@ -54,6 +56,15 @@ export class Store {
   deletedAt: Date | null;
 
   // RELATIONS
+  // 1 - N
   @OneToMany(() => Branch, (branch) => branch.store)
   branches: Branch[];
+
+  // 1 - N
+  @OneToMany(() => Category, (category) => category.store)
+  categories: Category[];
+
+  // 1 - N
+  @OneToMany(() => Product, (product) => product.store)
+  products: Product[];
 }

@@ -4,6 +4,14 @@ import { ConfigModule } from '@nestjs/config';
 import { StoreModule } from './store/store.module';
 import { BranchModule } from './branch/branch.module';
 import { UsersModule } from './users/users.module';
+import { CategoriesModule } from './categories/categories.module';
+import { ProductsModule } from './products/products.module';
+import { ProductVariantsModule } from './product-variants/product-variants.module';
+import { InventoryModule } from './inventory/inventory.module';
+import { StockTransfersModule } from './stock-transfers/stock-transfers.module';
+import { StockTransferItemsModule } from './stock-transfer-items/stock-transfer-items.module';
+import { CashModule } from './cash/cash.module';
+import { SalesModule } from './sales/sales.module';
 
 @Module({
   imports: [
@@ -26,12 +34,17 @@ import { UsersModule } from './users/users.module';
       synchronize: true,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
     }),
-
     StoreModule,
-
     BranchModule,
-
     UsersModule,
+    CategoriesModule,
+    ProductsModule,
+    ProductVariantsModule,
+    InventoryModule,
+    StockTransfersModule,
+    StockTransferItemsModule,
+    CashModule,
+    SalesModule,
   ],
   controllers: [],
   providers: [],
