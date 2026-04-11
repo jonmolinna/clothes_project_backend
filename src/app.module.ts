@@ -12,6 +12,9 @@ import { StockTransfersModule } from './stock-transfers/stock-transfers.module';
 import { StockTransferItemsModule } from './stock-transfer-items/stock-transfer-items.module';
 import { CashModule } from './cash/cash.module';
 import { SalesModule } from './sales/sales.module';
+import { SaleItemsModule } from './sale-items/sale-items.module';
+import { CustomersModule } from './customers/customers.module';
+import { LoyaltyTransactionsModule } from './loyalty-transactions/loyalty-transactions.module';
 
 @Module({
   imports: [
@@ -45,6 +48,9 @@ import { SalesModule } from './sales/sales.module';
     StockTransferItemsModule,
     CashModule,
     SalesModule,
+    SaleItemsModule,
+    CustomersModule,
+    LoyaltyTransactionsModule,
   ],
   controllers: [],
   providers: [],
