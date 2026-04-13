@@ -15,6 +15,8 @@ import { SalesModule } from './sales/sales.module';
 import { SaleItemsModule } from './sale-items/sale-items.module';
 import { CustomersModule } from './customers/customers.module';
 import { LoyaltyTransactionsModule } from './loyalty-transactions/loyalty-transactions.module';
+import { PlatformAdminModule } from './platform-admin/platform-admin.module';
+import { SunatCatalogItemsModule } from './sunat-catalog-items/sunat-catalog-items.module';
 
 @Module({
   imports: [
@@ -51,6 +53,8 @@ import { LoyaltyTransactionsModule } from './loyalty-transactions/loyalty-transa
     SaleItemsModule,
     CustomersModule,
     LoyaltyTransactionsModule,
+    PlatformAdminModule,
+    SunatCatalogItemsModule,
   ],
   controllers: [],
   providers: [],

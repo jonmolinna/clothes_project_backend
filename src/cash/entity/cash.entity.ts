@@ -19,16 +19,6 @@ export class Cash {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  /** Sede a la que pertenece la caja (FK -> branches). */
-  @ManyToOne(() => Branch, { onDelete: 'RESTRICT' })
-  @JoinColumn({ name: 'branch_id' })
-  branch: Branch;
-
-  /** Cajero responsable de la caja (FK -> users). */
-  @ManyToOne(() => User, { onDelete: 'RESTRICT' })
-  @JoinColumn({ name: 'user_id' })
-  user: User;
-
   /** Monto de apertura de caja. */
   @Column({ type: 'decimal', precision: 10, scale: 2, name: 'opening_amount' })
   openingAmount: string;
@@ -67,4 +57,15 @@ export class Cash {
     default: CashStatus.OPEN,
   })
   status: CashStatus;
+
+  // RELATIONS
+  /** Sede a la que pertenece la caja (FK -> branches). */
+  @ManyToOne(() => Branch, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'branch_id' })
+  branch: Branch;
+
+  /** Cajero responsable de la caja (FK -> users). */
+  @ManyToOne(() => User, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 }

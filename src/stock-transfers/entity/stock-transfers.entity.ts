@@ -1,4 +1,5 @@
 import { Branch } from 'src/branch/entity/branch.entity';
+import { Store } from 'src/store/entity/store.entity';
 import { User } from 'src/users/entity/users.entity';
 import {
   Column,
@@ -17,15 +18,41 @@ export enum StockTransferStatus {
 }
 
 /**
- * Traslado de stock entre sedes. Las FK a `branches` usan el tipo real de `branches.id` (INT en tu esquema).
+ * Traslado de stock entre sedes de una misma tienda.
+ * `from_branch_id` / `to_branch_id` usan el tipo de `branches.id` (entero en el esquema actual).
  */
 @Entity('stock_transfers')
 export class StockTransfer {
-  /** Identificador único del traslado. */
+  /** id — Identificador único (PK, uuid). */
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  /** Ciclo de vida: pendiente → aprobado → completado (o cancelado). */
+  /** store_id — Tienda dueña (FK → stores). */
+  @ManyToOne(() => Store, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'store_id' })
+  store: Store;
+
+  /** from_branch_id — Sede origen (FK → branches). */
+  @ManyToOne(() => Branch, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'from_branch_id' })
+  fromBranch: Branch;
+
+  /** to_branch_id — Sede destino (FK → branches). */
+  @ManyToOne(() => Branch, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'to_branch_id' })
+  toBranch: Branch;
+
+  /** requested_by — Quién solicitó (FK → users). */
+  @ManyToOne(() => User, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'requested_by' })
+  requestedBy: User;
+
+  /** approved_by — Quién aprobó (nullable; FK → users). */
+  @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'approved_by' })
+  approvedBy: User | null;
+
+  /** status — pending / approved / completed / cancelled. */
   @Column({
     type: 'enum',
     enum: StockTransferStatus,
@@ -34,29 +61,7 @@ export class StockTransfer {
   })
   status: StockTransferStatus;
 
-  /** Fecha en que se creó la solicitud de traslado. */
+  /** created_at — Fecha de creación de la solicitud. */
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
-
-
-  // RELATIONS
-  /** Sede desde la que sale el stock. */
-  @ManyToOne(() => Branch, { onDelete: 'RESTRICT' })
-  @JoinColumn({ name: 'from_branch_id' })
-  fromBranch: Branch;
-
-  /** Sede que recibe el stock. */
-  @ManyToOne(() => Branch, { onDelete: 'RESTRICT' })
-  @JoinColumn({ name: 'to_branch_id' })
-  toBranch: Branch;
-
-  /** Usuario que registró o solicitó el traslado. */
-  @ManyToOne(() => User, { onDelete: 'RESTRICT' })
-  @JoinColumn({ name: 'requested_by' })
-  requestedBy: User;
-
-  /** Usuario que aprobó el traslado; null mientras no se aprueba. */
-  @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'approved_by' })
-  approvedBy: User | null;
 }

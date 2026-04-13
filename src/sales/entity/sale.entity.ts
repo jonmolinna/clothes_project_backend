@@ -1,5 +1,7 @@
 import { Branch } from 'src/branch/entity/branch.entity';
 import { Cash } from 'src/cash/entity/cash.entity';
+import { Customer } from 'src/customers/entity/customer.entity';
+import { Store } from 'src/store/entity/store.entity';
 import { User } from 'src/users/entity/users.entity';
 import {
   Column,
@@ -26,23 +28,51 @@ export enum SaleStatus {
 
 @Entity('sales')
 export class Sale {
-  /** Identificador único */
+  /** id — Identificador único (PK, uuid). */
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  /** Antes de descuentos */
+  /** store_id — Tienda dueña (FK → stores). Denormalizado para consultas y futuro multi-tenant. */
+  @ManyToOne(() => Store, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'store_id' })
+  store: Store;
+
+  /** branch_id — Sede (FK → branches). */
+  @ManyToOne(() => Branch, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'branch_id' })
+  branch: Branch;
+
+  /** user_id — Cajero (FK → users). */
+  @ManyToOne(() => User, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'user_id' })
+  user: User;
+
+  /** customer_id — Cliente (nullable; FK → customers). */
+  @ManyToOne(() => Customer, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'customer_id' })
+  customer: Customer | null;
+
+  /**
+   * session_id — Sesión de caja (FK → cash).
+   * Si renombras la tabla a `cash_sessions`, el mapeo sigue siendo el mismo `session_id`.
+   */
+  @ManyToOne(() => Cash, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'session_id' })
+  session: Cash;
+
+  /** subtotal — Antes de descuentos (decimal 10,2). */
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   subtotal: string;
 
-  /** Descuento aplicado */
+  /** discount — Descuento aplicado (decimal 10,2). */
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   discount: string;
 
-  /** Total final */
+  /** total — Total final (decimal 10,2). */
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   total: string;
 
-  /** cash / card / yape / plin / mixed */
+  /** payment_method — cash / card / yape / plin / mixed. */
   @Column({
     type: 'enum',
     enum: SalePaymentMethod,
@@ -50,7 +80,7 @@ export class Sale {
   })
   paymentMethod: SalePaymentMethod;
 
-  /** completed / cancelled / refunded */
+  /** status — completed / cancelled / refunded. */
   @Column({
     type: 'enum',
     enum: SaleStatus,
@@ -58,28 +88,7 @@ export class Sale {
   })
   status: SaleStatus;
 
-  /** Fecha y hora */
+  /** created_at — Fecha y hora de registro. */
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
-
-  // Relaciones
-  /** Sede (FK → branches) */
-  @ManyToOne(() => Branch, { onDelete: 'RESTRICT' })
-  @JoinColumn({ name: 'branch_id' })
-  branch: Branch;
-
-  /** Cajero que registró (FK → users) */
-  @ManyToOne(() => User, { onDelete: 'RESTRICT' })
-  @JoinColumn({ name: 'user_id' })
-  user: User;
-
-  /** Cliente (nullable; FK → customers) */
-  @Column({ type: 'uuid', name: 'customer_id', nullable: true })
-  customerId: string | null;
-
-   /** Sesión de caja (FK → cash; equivale a cash_sessions si renombras la tabla) */
-   @ManyToOne(() => Cash, { onDelete: 'RESTRICT' })
-   @JoinColumn({ name: 'session_id' })
-   session: Cash;
-
 }
