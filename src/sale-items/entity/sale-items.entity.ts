@@ -33,6 +33,18 @@ export class SaleItem {
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   subtotal: string;
 
+  /** Catálogo SUNAT 07 — tipo de afectación al IGV (ej. 10 gravado); null en nota interna. */
+  @Column({ type: 'varchar', length: 2, name: 'igv_affectation_code', nullable: true })
+  igvAffectationCode: string | null;
+
+  /** Código de producto SUNAT (cat. 25 u otros) si aplica. */
+  @Column({ type: 'varchar', length: 20, name: 'sunat_product_code', nullable: true })
+  sunatProductCode: string | null;
+
+  /** Unidad de medida (cat. 03). */
+  @Column({ type: 'varchar', length: 3, name: 'unit_code', nullable: true })
+  unitCode: string | null;
+
   // Relaciones
    /** Venta (FK → sales) */
    @ManyToOne(() => Sale, { onDelete: 'CASCADE' })

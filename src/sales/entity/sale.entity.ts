@@ -1,6 +1,8 @@
 import { Branch } from 'src/branch/entity/branch.entity';
 import { Cash } from 'src/cash/entity/cash.entity';
 import { Customer } from 'src/customers/entity/customer.entity';
+import { SaleItem } from 'src/sale-items/entity/sale-items.entity';
+import { SaleDocument } from './sale-document.entity';
 import { Store } from 'src/store/entity/store.entity';
 import { User } from 'src/users/entity/users.entity';
 import {
@@ -9,6 +11,8 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -91,4 +95,11 @@ export class Sale {
   /** created_at — Fecha y hora de registro. */
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
+
+  /** Comprobante (boleta, factura o nota de venta) 1:1. */
+  @OneToOne(() => SaleDocument, (doc) => doc.sale)
+  document?: SaleDocument;
+
+  @OneToMany(() => SaleItem, (item) => item.sale)
+  saleItems: SaleItem[];
 }

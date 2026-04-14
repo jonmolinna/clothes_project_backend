@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { getDataSourceToken } from '@nestjs/typeorm';
 import { SalesService } from './sales.service';
 
 describe('SalesService', () => {
@@ -6,7 +7,15 @@ describe('SalesService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [SalesService],
+      providers: [
+        SalesService,
+        {
+          provide: getDataSourceToken(),
+          useValue: {
+            transaction: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     service = module.get<SalesService>(SalesService);
