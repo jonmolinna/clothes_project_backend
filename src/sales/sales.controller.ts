@@ -2,23 +2,18 @@ import {
   BadRequestException,
   Body,
   Controller,
-  Headers,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
 import { CreateSaleDto } from 'src/sales/dto/create-sale.dto';
 import { SaleActorContextDto } from 'src/sales/dto/sale-actor.dto';
 import { SalesService } from './sales.service';
-
-function headerString(
-  headers: Record<string, string | string[] | undefined>,
-  name: string,
-): string | undefined {
-  const v = headers[name.toLowerCase()] ?? headers[name];
-  if (Array.isArray(v)) {
-    return v[0];
-  }
-  return v;
-}
+import { UserRole } from 'src/users/entity/users.entity';
 
 @Controller('sales')
 export class SalesController {
@@ -28,30 +23,30 @@ export class SalesController {
    * Crea una venta con comprobante y descuenta stock.
    * `branchId` y `storeId` deben venir del token JWT; aquí se leen cabeceras para desarrollo.
    */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.VENTAS, UserRole.CAJERO)
   @Post()
   create(
     @Body() dto: CreateSaleDto,
-    @Headers() headers: Record<string, string | string[] | undefined>,
+    @Req() req: { user: JwtPayload },
   ) {
-    const actor = this.parseActor(headers);
+    const actor = this.parseActor(req.user);
     return this.salesService.create(dto, actor);
   }
 
-  private parseActor(
-    headers: Record<string, string | string[] | undefined>,
-  ): SaleActorContextDto {
-    const userId = headerString(headers, 'x-user-id');
-    const branchRaw = headerString(headers, 'x-branch-id');
-    const storeId = headerString(headers, 'x-store-id');
-    if (!userId || !branchRaw || !storeId) {
+  private parseActor(payload: JwtPayload | undefined): SaleActorContextDto {
+    if (!payload) {
+      throw new BadRequestException('Usuario autenticado requerido');
+    }
+    if (!payload.branchId || !Number.isFinite(payload.branchId)) {
       throw new BadRequestException(
-        'Cabeceras x-user-id, x-branch-id y x-store-id son requeridas',
+        'El usuario autenticado no tiene una sede asignada',
       );
     }
-    const branchId = Number.parseInt(branchRaw, 10);
-    if (!Number.isFinite(branchId)) {
-      throw new BadRequestException('x-branch-id inválido');
-    }
-    return { userId, branchId, storeId };
+    return {
+      userId: payload.sub,
+      branchId: payload.branchId,
+      storeId: payload.storeId,
+    };
   }
 }
