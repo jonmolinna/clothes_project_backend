@@ -11,6 +11,7 @@ import {
   RefreshTokenOptions,
 } from './constants/jwt.constants';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { LocalStrategy } from './strategies/local.strategy';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
   providers: [
     AuthService,
     JwtStrategy,
+    LocalStrategy,
     {
       provide: AUTH_REFRESH_OPTIONS,
       inject: [ConfigService],

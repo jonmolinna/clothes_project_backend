@@ -12,6 +12,7 @@ import {
 import type { RefreshTokenOptions } from 'src/auth/constants/jwt.constants';
 import { LoginDto } from 'src/auth/dto/login.dto';
 import { RefreshTokenDto } from 'src/auth/dto/refresh-token.dto';
+import { AuthLoginResponse } from 'src/auth/interfaces/auth-login-response.interface';
 import { AuthTokens } from 'src/auth/interfaces/auth-tokens.interface';
 import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
 import { UsersService } from 'src/users/users.service';
@@ -21,29 +22,42 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    
     @Inject(AUTH_REFRESH_OPTIONS)
     private readonly refreshTokenOptions: RefreshTokenOptions,
   ) {}
 
-  async login(dto: LoginDto) {
+  // FUNCION QUE PERMITE INICIAR SESION
+  async login(dto: LoginDto): Promise<AuthLoginResponse> {
     const user = await this.usersService.findByEmailAndStore(dto.email, dto.storeId);
+    
+    // VALIDACION DE USUARIO
     if (!user) {
       throw new UnauthorizedException('Credenciales inválidas');
     }
+
+    // VALIDACION DE USUARIO ACTIVO
     if (!user.isActive) {
-      throw new UnauthorizedException('Usuario inactivo');
+      throw new UnauthorizedException('Credenciales inválidas');
     }
 
+    // VALIDACION DE CONTRASEÑA
     const isValidPassword = await bcrypt.compare(dto.password, user.passwordHash);
+    
+    // VALIDACION DE CONTRASEÑA
     if (!isValidPassword) {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
+    // VALIDACION DE TIENDA
     if (!user.store?.id) {
       throw new UnprocessableEntityException('Usuario sin tienda asociada');
     }
 
+    // CONSTRUCCION DEL PAYLOAD
     const payload = this.buildPayload(user);
+
+    // FIRMADO DE LOS TOKENS
     const tokens = await this.signTokens(payload);
 
     return {
@@ -59,6 +73,7 @@ export class AuthService {
     };
   }
 
+  // FUNCION QUE PERMITE RENOVAR LOS TOKENS
   async refreshTokens(dto: RefreshTokenDto): Promise<AuthTokens> {
     let payload: JwtPayload;
     try {
@@ -77,12 +92,15 @@ export class AuthService {
     return this.signTokens(this.buildPayload(user));
   }
 
+  // FUNCION QUE PERMITE CONSTRUIR EL PAYLOAD PARA LOS TOKENS
   private buildPayload(user: {
     id: string;
     role: JwtPayload['role'];
     store?: { id: string } | null;
     branch?: { id: number } | null;
   }): JwtPayload {
+
+    // VALIDACION DE TIENDA
     if (!user.store?.id) {
       throw new UnprocessableEntityException('Usuario sin tienda asociada');
     }
@@ -95,6 +113,7 @@ export class AuthService {
     };
   }
 
+  // FUNCION QUE PERMITE FIRMAR LOS TOKENS
   private async signTokens(payload: JwtPayload): Promise<AuthTokens> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload),

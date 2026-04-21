@@ -10,6 +10,7 @@ export class UsersService {
     private readonly usersRepository: Repository<User>,
   ) {}
 
+  // FUNCION QUE PERMITE BUSCAR UN USUARIO POR EMAIL Y STORE
   findByEmailAndStore(email: string, storeId: string): Promise<User | null> {
     return this.usersRepository.findOne({
       where: {
@@ -20,6 +21,7 @@ export class UsersService {
     });
   }
 
+  // FUNCION QUE PERMITE BUSCAR UN USUARIO POR ID
   findById(id: string): Promise<User | null> {
     return this.usersRepository.findOne({
       where: { id },
