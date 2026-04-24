@@ -10,7 +10,7 @@ import {
   AUTH_REFRESH_OPTIONS,
 } from 'src/auth/constants/jwt.constants';
 import type { RefreshTokenOptions } from 'src/auth/constants/jwt.constants';
-import { LoginDto } from 'src/auth/dto/login.dto';
+import { LoginCredentialsDto } from 'src/auth/dto/login-credentials.dto';
 import { RefreshTokenDto } from 'src/auth/dto/refresh-token.dto';
 import { AuthLoginResponse } from 'src/auth/interfaces/auth-login-response.interface';
 import { AuthTokens } from 'src/auth/interfaces/auth-tokens.interface';
@@ -28,8 +28,11 @@ export class AuthService {
   ) {}
 
   // FUNCION QUE PERMITE INICIAR SESION
-  async login(dto: LoginDto): Promise<AuthLoginResponse> {
-    const user = await this.usersService.findByEmailAndStore(dto.email, dto.storeId);
+  async login(dto: LoginCredentialsDto): Promise<AuthLoginResponse> {
+    const user = await this.usersService.findByEmailAndStoreSlug(
+      dto.email,
+      dto.storeSlug,
+    );
     
     // VALIDACION DE USUARIO
     if (!user) {

@@ -8,13 +8,13 @@ import { UserRole } from 'src/users/entity/users.entity';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let usersService: { findByEmailAndStore: jest.Mock; findById: jest.Mock };
+  let usersService: { findByEmailAndStoreSlug: jest.Mock; findById: jest.Mock };
   let jwtService: { signAsync: jest.Mock; verifyAsync: jest.Mock };
   let refreshTokenOptions: RefreshTokenOptions;
 
   beforeEach(() => {
     usersService = {
-      findByEmailAndStore: jest.fn(),
+      findByEmailAndStoreSlug: jest.fn(),
       findById: jest.fn(),
     };
     jwtService = {
@@ -34,7 +34,7 @@ describe('AuthService', () => {
 
   it('returns access and refresh tokens when credentials are valid', async () => {
     const hashedPassword = await bcrypt.hash('secret123', 10);
-    usersService.findByEmailAndStore.mockResolvedValue({
+    usersService.findByEmailAndStoreSlug.mockResolvedValue({
       id: 'user-1',
       name: 'Test User',
       email: 'test@example.com',
@@ -49,9 +49,9 @@ describe('AuthService', () => {
       .mockResolvedValueOnce('refresh-token');
 
     const result = await service.login({
-      storeId: 'store-1',
       email: 'test@example.com',
       password: 'secret123',
+      storeSlug: 'store-slug',
     });
 
     expect(result.accessToken).toBe('access-token');
@@ -82,7 +82,7 @@ describe('AuthService', () => {
 
   it('throws when password is invalid', async () => {
     const hashedPassword = await bcrypt.hash('secret123', 10);
-    usersService.findByEmailAndStore.mockResolvedValue({
+    usersService.findByEmailAndStoreSlug.mockResolvedValue({
       id: 'user-1',
       isActive: true,
       passwordHash: hashedPassword,
@@ -93,9 +93,9 @@ describe('AuthService', () => {
 
     await expect(
       service.login({
-        storeId: 'store-1',
         email: 'test@example.com',
         password: 'wrong-password',
+        storeSlug: 'store-slug',
       }),
     ).rejects.toBeInstanceOf(UnauthorizedException);
   });

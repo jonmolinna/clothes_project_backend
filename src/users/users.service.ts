@@ -20,6 +20,16 @@ export class UsersService {
       relations: ['store', 'branch'],
     });
   }
+  // FUNCION QUE PERMITE BUSCAR UN USUARIO POR EMAIL Y STORE SLUG
+  findByEmailAndStoreSlug(email: string, storeSlug: string): Promise<User | null> {
+    return this.usersRepository.findOne({
+      where: {
+        email: email.toLowerCase().trim(),
+        store: { slug: storeSlug.toLowerCase().trim() },
+      },
+      relations: ['store', 'branch'],
+    });
+  }
 
   // FUNCION QUE PERMITE BUSCAR UN USUARIO POR ID
   findById(id: string): Promise<User | null> {
